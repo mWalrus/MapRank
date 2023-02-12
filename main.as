@@ -1,0 +1,3 @@
+void Main() {
+	print("Testing");
+}
