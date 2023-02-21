@@ -3,3 +3,6 @@ version   = "0.1"
 name      = "Player Count"
 author    = "walrus"
 category  = "Race"
+
+[script]
+dependencies = [ "NadeoServices" ]
