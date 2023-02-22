@@ -16,20 +16,11 @@ void Render() {
 }
 
 void Main() {
-	// required steps using the unofficial undocumented trackmania.io API
-	// 1. get relevant IDs by official means
-	//    1.1 campaign ID
-	//	  1.2 club ID
-	// 2. make a request to https://trackmania.io/api/campaign/{CLUB_ID}/{CAMPAIGN_ID}
-	// 3. take the leaderboarduid from the response
-	// 4. format a request URL for getting player count
-	// 	  - https://trackmania.io/api/leaderboard/{LEADERBOARDUID}/{MAP_UID}?offset=0&length=1
-	// 5. profit
-	
 	NadeoServices::AddAudience("NadeoLiveServices");
 	while(!NadeoServices::IsAuthenticated("NadeoLiveServices")) yield();
 	
 	auto app = cast<CTrackMania>(GetApp());
+	auto network = cast<CTrackManiaNetwork>(app.Network);
 
 	string currentMapUid = "";
 
@@ -37,8 +28,35 @@ void Main() {
 		auto map = app.RootMap;
 
 		if (show && map !is null && map.MapInfo.MapUid != currentMapUid && app.Editor is null) {
-			print("Entered a new map! (" + map.MapInfo.MapUid + ")");
-			currentMapUid = map.MapInfo.MapUid;
+			auto map_uid = map.MapInfo.MapUid;
+			print("Entered map: " + map_uid);
+
+			int score;
+			if (network.ClientManiaAppPlayground !is null) {
+				auto userMgr = network.ClientManiaAppPlayground.UserMgr;
+				MwId userId;
+				if (userMgr.Users.Length > 0) {
+					userId = userMgr.Users[0].Id;
+				} else {
+					userId.Value = uint(-1);
+				}
+
+				auto scoreMgr = network.ClientManiaAppPlayground.ScoreMgr;
+
+				score = scoreMgr.Map_GetRecord_v2(userId, map_uid, "PersonalBest", "", "TimeAttack", "");
+			} else {
+				// we dont handle online cases as of yet.
+				// reference for the future:
+				// https://github.com/Phlarx/tm-ultimate-medals/blob/147055b748332ddaa99cfbc2534e1ff835bdff29/UltimateMedals.as#L593-L599
+				score = 0;
+			}
+
+			uint position = Api::GetPlayerPosition(map_uid, score);
+			uint player_count = Api::GetPlayerCount(map_uid);
+			
+			print("Position: " + position + "/" + player_count);
+
+			currentMapUid = map_uid;
 		}
 		sleep(500);
 	}
