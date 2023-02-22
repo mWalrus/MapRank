@@ -5,15 +5,12 @@ namespace Api {
 		auto url = MAP_MONITOR_URL + map_uid + "?length=1&utm_source=playercount-plugin";
 		auto req = Net::HttpRequest();
 
-		// set up request
 		req.Url = url;
 		req.Headers['User-Agent'] = 'PlayerCount/Openplanet-Plugin/contact=@mWalrus';
 		req.Method = Net::HttpMethod::Get;
 
-		// init request
 		req.Start();
 
-		// wait for response
 		while(!req.Finished()) yield();
 
 		const Json::Value@ json = Json::Parse(req.String());
@@ -21,7 +18,7 @@ namespace Api {
 		return player_count;
 	}
 
-	uint GetPlayerPosition(const string &in map_uid, const uint &in score) {
+	int GetPlayerPosition(const string &in map_uid, const uint &in score) {
 		Net::HttpRequest@ req = NadeoServices::Get(
 			"NadeoLiveServices",
 			NadeoServices::BaseURL()
@@ -32,12 +29,14 @@ namespace Api {
 		);
 
 		req.Start();
+
 		while(!req.Finished()) yield();
 
 		Json::Value json = Json::Parse(req.String());
+
 		Json::Value pos = json['tops'][0]['top'][0];
 
-		uint position = pos.Get('position', 0);
+		int position = pos.Get('position', -1);
 
 		return position;
 	}	
