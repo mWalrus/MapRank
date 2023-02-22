@@ -34,9 +34,10 @@ namespace Api {
 
 		Json::Value json = Json::Parse(req.String());
 
-		Json::Value pos = json['tops'][0]['top'][0];
+		Json::Value tops = json['tops'][0];
+		Json::Value top = tops['top'][0];
 
-		int position = pos.Get('position', -1);
+		int position = top.Get('position', -1);
 
 		return position;
 	}	
