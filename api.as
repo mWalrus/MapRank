@@ -32,6 +32,7 @@ namespace Api {
 
 		Json::Value json = Json::Parse(req.String());
 
+		// FIXME: error handling
 		Json::Value tops = json['tops'][0];
 		Json::Value top = tops['top'][0];
 
