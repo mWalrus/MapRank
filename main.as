@@ -22,7 +22,6 @@ void RenderMenu() {
 }
 
 void Render() {
-	// draw window
 	auto app = cast<CTrackMania>(GetApp());
 
 	auto map = app.RootMap;
@@ -52,23 +51,18 @@ void Main() {
 	auto app = cast<CTrackMania>(GetApp());
 	auto network = cast<CTrackManiaNetwork>(app.Network);
 
-	bool isFirstIteration = true;
 	while (true) {
 		auto map = app.RootMap;
 
-		if (map is null) Message = InitMessage;
-		else {
+		if (map is null) {
+			// set everything back to default
+			Message = InitMessage;
+			PlayerScore = -1;
+			ShouldRefetchLeaderboard = false;
+		} else {
 			int score = GetPlayerScore(network, map.MapInfo.MapUid);
-
-			// FIXME: leaderboard rankings are not updated when you finish for some reason
-			if (score < PlayerScore && !ShouldRefetchLeaderboard) {
-				ShouldRefetchLeaderboard = true;
-				PlayerScore = score;
-			} else if (score >= PlayerScore && ShouldRefetchLeaderboard) {
-				ShouldRefetchLeaderboard = false;
-			} else if (isFirstIteration) {
-				PlayerScore = score;
-				isFirstIteration = false;
+			if ((score > 0 && score < PlayerScore) || (PlayerScore == -1 && score > 0)) {
+				UpdatePlayerScore(score);
 			}
 		}
 
@@ -79,10 +73,6 @@ void Main() {
 		}
 		sleep(500);
 	}
-}
-
-float CalcPositionPercentage(const int &in pos, const uint &in total) {
-	return float(int(((float(pos) / float(total)) * 100.0) * 100.0)) / 100.0;
 }
 
 void GetLeaderboardInfo(CGameCtnChallenge@ &in map, CTrackManiaNetwork@ &in network) {
@@ -100,7 +90,6 @@ void GetLeaderboardInfo(CGameCtnChallenge@ &in map, CTrackManiaNetwork@ &in netw
 		Message = GlobeIcon + "Total: ~" + player_count + " players";
 	} else {
 		int position = Api::GetPlayerPosition(map_uid, PlayerScore);
-		trace("Current player score: " + PlayerScore);
 		trace("Fetched player's leaderboard position: " + position);
 
 		auto percentage = CalcPositionPercentage(position, player_count);
@@ -109,6 +98,7 @@ void GetLeaderboardInfo(CGameCtnChallenge@ &in map, CTrackManiaNetwork@ &in netw
 	}
 
 	CurrentMapUid = map_uid;
+	ShouldRefetchLeaderboard = false;
 }
 
 int GetPlayerScore(CTrackManiaNetwork@ &in network, const string &in map_uid) {
@@ -131,4 +121,13 @@ int GetPlayerScore(CTrackManiaNetwork@ &in network, const string &in map_uid) {
 	auto scoreMgr = network.ClientManiaAppPlayground.ScoreMgr;
 
 	return scoreMgr.Map_GetRecord_v2(userId, map_uid, "PersonalBest", "", "TimeAttack", "");
+}
+
+void UpdatePlayerScore(const int &in score) {
+	ShouldRefetchLeaderboard = true;
+	PlayerScore = score;
+}
+
+float CalcPositionPercentage(const int &in pos, const uint &in total) {
+	return float(int(((float(pos) / float(total)) * 100.0) * 100.0)) / 100.0;
 }

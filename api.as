@@ -19,14 +19,12 @@ namespace Api {
 	}
 
 	int GetPlayerPosition(const string &in map_uid, const uint &in score) {
-		Net::HttpRequest@ req = NadeoServices::Get(
-			"NadeoLiveServices",
-			NadeoServices::BaseURL()
+		string url = NadeoServices::BaseURL()
 				+ "/api/token/leaderboard/group/Personal_Best/map/"
 				+ map_uid
-				+ "/surround/0/0?score"
-				+ score
-		);
+				+ "/surround/0/0?score="
+				+ score;
+		Net::HttpRequest@ req = NadeoServices::Get("NadeoLiveServices", url);
 
 		req.Start();
 
