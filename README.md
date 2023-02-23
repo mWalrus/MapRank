@@ -1,4 +1,4 @@
-# PlayerCount
-![demo image](./media/demo.png)
+# MapRank
+A minimal trackmania plugin which displays additional information about your world rankings on the current map you're playing.
 
-A minimal trackmania plugin which displays additional information about your current world rankings.
+![demo image](./media/demo.png)

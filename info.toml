@@ -1,7 +1,7 @@
 [meta]
 version   = "0.1"
-name      = "Player Count"
-author    = "walrus"
+name      = "Map Rank"
+author    = "mWalrus"
 category  = "Race"
 
 [script]
