@@ -16,7 +16,7 @@ bool ShouldRefetchLeaderboard = false;
 int PlayerScore = -1;
 
 void RenderMenu() {
-	if (UI::MenuItem(ListIcon + "Player Count", "", Show)) {
+	if (UI::MenuItem(ListIcon + "Map Rank", "", Show)) {
 		Show = !Show;
 	}
 }
@@ -37,7 +37,7 @@ void Render() {
 	int windowFlags = UI::WindowFlags::NoTitleBar | UI::WindowFlags::NoCollapse | UI::WindowFlags::AlwaysAutoResize | UI::WindowFlags::NoDocking;
 	if (!UI::IsOverlayShown()) windowFlags |= UI::WindowFlags::NoInputs;
 
-	UI::Begin("Player Count", windowFlags);
+	UI::Begin("Map Rank", windowFlags);
 	UI::Text(Message);
 	UI::End();
 }
@@ -67,6 +67,7 @@ void Main() {
 		}
 
 		if (Show && map !is null && map.MapInfo.MapUid != CurrentMapUid && app.Editor is null) {
+			trace("Entered map: " + map_uid);
 			GetLeaderboardInfo(map, network);
 		} else if (ShouldRefetchLeaderboard) {
 			GetLeaderboardInfo(map, network);
@@ -79,7 +80,6 @@ void GetLeaderboardInfo(CGameCtnChallenge@ &in map, CTrackManiaNetwork@ &in netw
 	Message = Icons::CloudDownload + " Fetching leaderboard info...";
 
 	auto map_uid = map.MapInfo.MapUid;
-	trace("Entered map: " + map_uid);
 
 	uint player_count = Api::GetPlayerCount(map_uid);
 	trace("Fetched total player count: " + player_count);
