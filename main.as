@@ -67,7 +67,7 @@ void Main() {
 		}
 
 		if (Show && map !is null && map.MapInfo.MapUid != CurrentMapUid && app.Editor is null) {
-			trace("Entered map: " + map_uid);
+			trace("Entered map: " + map.MapInfo.MapUid);
 			GetLeaderboardInfo(map, network);
 		} else if (ShouldRefetchLeaderboard) {
 			GetLeaderboardInfo(map, network);
