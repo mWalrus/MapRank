@@ -6,4 +6,4 @@ read -r VERSION
 
 sed -E -i "2s/$VERSION_REGEX/$VERSION/I" ./info.toml
 
-command -v zip > /dev/null && zip "MapRank-v$VERSION.op" ./*.as ./info.toml || printf "Failed to build release archive"
+command -v zip > /dev/null && zip "./releases/MapRank-v$VERSION.op" ./*.as ./info.toml || printf "Failed to build release archive"
