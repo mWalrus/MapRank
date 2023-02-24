@@ -92,9 +92,12 @@ void GetLeaderboardInfo(CGameCtnChallenge@ &in map, CTrackManiaNetwork@ &in netw
 		int position = Api::GetPlayerPosition(map_uid, PlayerScore);
 		trace("Fetched player's leaderboard position: " + position);
 
-		auto percentage = CalcPositionPercentage(position, player_count);
-
-		Message = GlobeIcon + "Rank " + position + "/~" + player_count + " (Top " + percentage + "%)";
+		if (position == 1) {
+			Message = GlobeIcon + "Rank " + position + "/~" + player_count + " (WR)";
+		} else {
+			auto percentage = CalcPositionPercentage(position, player_count);
+			Message = GlobeIcon + "Rank " + position + "/~" + player_count + " (Top " + percentage + "%)";
+		}
 	}
 
 	CurrentMapUid = map_uid;
