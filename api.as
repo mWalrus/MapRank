@@ -2,11 +2,10 @@ namespace Api {
 	const string MAP_MONITOR_URL = "https://trackmania.io/api/leaderboard/map/";
 
 	uint GetPlayerCount(const string &in map_uid) {
-		auto url = MAP_MONITOR_URL + map_uid + "?length=1&utm_source=maprank-plugin";
+		auto url = MAP_MONITOR_URL + map_uid + "?length=1";
 		auto req = Net::HttpRequest();
 
 		req.Url = url;
-		req.Headers['User-Agent'] = 'MapRank/Openplanet-Plugin/contact=@mWalrus';
 		req.Method = Net::HttpMethod::Get;
 
 		req.Start();
