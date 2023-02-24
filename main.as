@@ -54,7 +54,7 @@ void Main() {
 	while (true) {
 		auto map = app.RootMap;
 
-		if (map is null) {
+		if (map is null || map.MapInfo.MapUid != CurrentMapUid) {
 			// set everything back to default
 			Message = InitMessage;
 			PlayerScore = -1;
