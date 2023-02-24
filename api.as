@@ -32,11 +32,21 @@ namespace Api {
 
 		Json::Value json = Json::Parse(req.String());
 
-		// FIXME: error handling
-		Json::Value tops = json['tops'][0];
-		Json::Value top = tops['top'][0];
+		Json::Value tops = json['tops'];
 
-		int position = top.Get('position', -1);
+		if (Json::Type::Array != tops.GetType()) {
+			trace("Failed to get world tops");
+			return -1;
+		}
+
+		Json::Value world_top = tops[0]['top'];
+
+		if (Json::Type::Array != world_top.GetType()) {
+			trace("Failed to get player's world position");
+			return -1;
+		}
+
+		int position = world_top[0].Get('position', -1);
 
 		return position;
 	}	
