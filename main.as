@@ -54,24 +54,27 @@ void Main() {
 	while (true) {
 		auto map = app.RootMap;
 
-		if (map is null || map.MapInfo.MapUid != CurrentMapUid) {
-			// set everything back to default
-			Message = InitMessage;
+		bool enteredNewMap = map !is null && map.MapInfo.MapUid != CurrentMapUid && app.Editor is null;
+
+		if (map is null || enteredNewMap) {
 			PlayerScore = -1;
 			ShouldRefetchLeaderboard = false;
-		} else {
+			Message = InitMessage;
+			if (map !is null) {
+				CurrentMapUid = map.MapInfo.MapUid;
+				ShouldRefetchLeaderboard = true;
+			}
+		} else if (map !is null && !enteredNewMap) {
 			int score = GetPlayerScore(network, map.MapInfo.MapUid);
-			if ((score > 0 && score < PlayerScore) || (PlayerScore == -1 && score > 0)) {
-				UpdatePlayerScore(score);
+			if (score > 0 && (PlayerScore == -1 || score < PlayerScore)) {
+				PlayerScore = score;
+				ShouldRefetchLeaderboard = true;
+			}
+			if (ShouldRefetchLeaderboard) {
+				GetLeaderboardInfo(map, network);
 			}
 		}
-
-		if (Show && map !is null && map.MapInfo.MapUid != CurrentMapUid && app.Editor is null) {
-			trace("Entered map: " + map.MapInfo.MapUid);
-			GetLeaderboardInfo(map, network);
-		} else if (ShouldRefetchLeaderboard) {
-			GetLeaderboardInfo(map, network);
-		}
+		
 		sleep(500);
 	}
 }
@@ -100,7 +103,6 @@ void GetLeaderboardInfo(CGameCtnChallenge@ &in map, CTrackManiaNetwork@ &in netw
 		}
 	}
 
-	CurrentMapUid = map_uid;
 	ShouldRefetchLeaderboard = false;
 }
 
@@ -124,11 +126,6 @@ int GetPlayerScore(CTrackManiaNetwork@ &in network, const string &in map_uid) {
 	auto scoreMgr = network.ClientManiaAppPlayground.ScoreMgr;
 
 	return scoreMgr.Map_GetRecord_v2(userId, map_uid, "PersonalBest", "", "TimeAttack", "");
-}
-
-void UpdatePlayerScore(const int &in score) {
-	ShouldRefetchLeaderboard = true;
-	PlayerScore = score;
 }
 
 float CalcPositionPercentage(const int &in pos, const uint &in total) {
