@@ -1,8 +1,8 @@
 namespace Api {
-	const string MAP_MONITOR_URL = "https://trackmania.io/api/leaderboard/map/";
+	const string TRACKMANIA_IO_URL = "https://trackmania.io/api/leaderboard/map/";
 
 	uint GetPlayerCount(const string &in map_uid) {
-		auto url = MAP_MONITOR_URL + map_uid + "?length=1";
+		auto url = TRACKMANIA_IO_URL + map_uid + "?length=1";
 		auto req = Net::HttpRequest();
 
 		req.Url = url;
@@ -34,7 +34,7 @@ namespace Api {
 		Json::Value tops = json['tops'];
 
 		if (Json::Type::Array != tops.GetType()) {
-			trace("Failed to get world tops");
+			trace("Failed to get leaderboards");
 			return -1;
 		}
 
