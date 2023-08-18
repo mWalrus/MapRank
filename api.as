@@ -12,6 +12,10 @@ namespace Api {
 
 		while(!req.Finished()) yield();
 
+		if (req.ResponseCode() != 200) {
+			return -1;
+		}
+
 		const Json::Value@ json = Json::Parse(req.String());
 		uint player_count = json.Get('player_count', 0);
 		return player_count;

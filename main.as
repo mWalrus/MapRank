@@ -3,10 +3,12 @@ bool Show = true;
 
 string Purple = "\\$96F";
 string Blue = "\\$06C";
+string Red = "\\$f00";
 string ResetColor = "\\$z";
 
 string GlobeIcon = Blue + Icons::Globe + ResetColor + " ";
 string ListIcon = Purple + Icons::ThList + ResetColor + " ";
+string ErrorIcon = Red + Icons::TimesCircle + ResetColor + " ";
 
 string InitMessage = Icons::PlayCircle + " Initializing!";
 string Message = InitMessage;
@@ -84,7 +86,7 @@ void GetLeaderboardInfo(CGameCtnChallenge@ &in map, CTrackManiaNetwork@ &in netw
 
 	auto map_uid = map.MapInfo.MapUid;
 
-	uint player_count = Api::GetPlayerCount(map_uid);
+	int player_count = Api::GetPlayerCount(map_uid);
 	trace("Fetched total player count: " + player_count);
 
 	// no need to keep going for this iteration since we can't find a score
@@ -98,7 +100,9 @@ void GetLeaderboardInfo(CGameCtnChallenge@ &in map, CTrackManiaNetwork@ &in netw
 		if (position == 1) {
 			Message = GlobeIcon + "Rank " + position + "/~" + player_count + " (WR)";
 		} else if (player_count == 0) {
-			Message = GlobeIcon + "Total: No players yet"
+			Message = GlobeIcon + "Total: No players yet";
+		} else if (player_count == -1) {
+			Message = ErrorIcon + "Something went wrong!";
 		} else {
 			auto percentage = CalcPositionPercentage(position, player_count);
 			Message = GlobeIcon + "Rank " + position + "/~" + player_count + " (Top " + percentage + "%)";
@@ -130,6 +134,6 @@ int GetPlayerScore(CTrackManiaNetwork@ &in network, const string &in map_uid) {
 	return scoreMgr.Map_GetRecord_v2(userId, map_uid, "PersonalBest", "", "TimeAttack", "");
 }
 
-float CalcPositionPercentage(const int &in pos, const uint &in player_count) {
+float CalcPositionPercentage(const int &in pos, const int &in player_count) {
 	return float(int(((float(pos) / float(player_count)) * 100.0) * 100.0)) / 100.0;
 }
