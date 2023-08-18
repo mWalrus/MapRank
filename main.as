@@ -97,6 +97,8 @@ void GetLeaderboardInfo(CGameCtnChallenge@ &in map, CTrackManiaNetwork@ &in netw
 
 		if (position == 1) {
 			Message = GlobeIcon + "Rank " + position + "/~" + player_count + " (WR)";
+		} else if (player_count == 0) {
+			Message = GlobeIcon + "Total: No players yet"
 		} else {
 			auto percentage = CalcPositionPercentage(position, player_count);
 			Message = GlobeIcon + "Rank " + position + "/~" + player_count + " (Top " + percentage + "%)";
@@ -128,6 +130,6 @@ int GetPlayerScore(CTrackManiaNetwork@ &in network, const string &in map_uid) {
 	return scoreMgr.Map_GetRecord_v2(userId, map_uid, "PersonalBest", "", "TimeAttack", "");
 }
 
-float CalcPositionPercentage(const int &in pos, const uint &in total) {
-	return float(int(((float(pos) / float(total)) * 100.0) * 100.0)) / 100.0;
+float CalcPositionPercentage(const int &in pos, const uint &in player_count) {
+	return float(int(((float(pos) / float(player_count)) * 100.0) * 100.0)) / 100.0;
 }
