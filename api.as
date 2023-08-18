@@ -1,8 +1,8 @@
 namespace Api {
-	const string TRACKMANIA_IO_URL = "https://tm.waalrus.xyz/np/map/";
+	const string TM_API_URL = "https://tm.waalrus.xyz/np/map/";
 
 	uint GetPlayerCount(const string &in map_uid) {
-		auto url = TRACKMANIA_IO_URL + map_uid;
+		auto url = TM_API_URL + map_uid;
 		auto req = Net::HttpRequest();
 
 		req.Url = url;
