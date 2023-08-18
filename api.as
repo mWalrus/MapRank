@@ -22,7 +22,7 @@ namespace Api {
 	}
 
 	int GetPlayerPosition(const string &in map_uid, const uint &in score) {
-		string url = NadeoServices::BaseURL()
+		string url = NadeoServices::BaseURLLive()
 				+ "/api/token/leaderboard/group/Personal_Best/map/"
 				+ map_uid
 				+ "/surround/0/0?score="
