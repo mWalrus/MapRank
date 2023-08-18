@@ -1,8 +1,8 @@
 namespace Api {
-	const string TRACKMANIA_IO_URL = "https://trackmania.io/api/leaderboard/map/";
+	const string TRACKMANIA_IO_URL = "https://tm.waalrus.xyz/np/map/";
 
 	uint GetPlayerCount(const string &in map_uid) {
-		auto url = TRACKMANIA_IO_URL + map_uid + "?length=1";
+		auto url = TRACKMANIA_IO_URL + map_uid;
 		auto req = Net::HttpRequest();
 
 		req.Url = url;
@@ -13,7 +13,7 @@ namespace Api {
 		while(!req.Finished()) yield();
 
 		const Json::Value@ json = Json::Parse(req.String());
-		uint player_count = json.Get('playercount', 0);
+		uint player_count = json.Get('player_count', 0);
 		return player_count;
 	}
 
