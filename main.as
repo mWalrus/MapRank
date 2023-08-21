@@ -4,18 +4,29 @@ bool Show = true;
 string Purple = "\\$96F";
 string Blue = "\\$06C";
 string Red = "\\$f00";
+string LightBlue = "\\$ADE";
+string Gray = "\\$888";
+string Green = "\\$0d0";
 string ResetColor = "\\$z";
 
 string GlobeIcon = Blue + Icons::Globe + ResetColor + " ";
 string ListIcon = Purple + Icons::ThList + ResetColor + " ";
 string ErrorIcon = Red + Icons::TimesCircle + ResetColor + " ";
+string NextIcon = Green + Icons::Kenney::NextAlt + ResetColor + " ";
 
 string InitMessage = Icons::PlayCircle + " Initializing!";
 string Message = InitMessage;
 
+int MapPlayerCount = 0;
+
 string CurrentMapUid = "";
 bool ShouldRefetchLeaderboard = false;
 int PlayerScore = -1;
+
+bool DisplayLookup = false;
+bool PosButtonPressed = false;
+string TimeInput = "";
+string PosLookupResult = "";
 
 void RenderMenu() {
 	if (UI::MenuItem(ListIcon + "Map Rank", "", Show)) {
@@ -41,6 +52,25 @@ void Render() {
 
 	UI::Begin("Map Rank", windowFlags);
 	UI::Text(Message);
+	UI::Separator();
+	DisplayLookup = UI::CollapsingHeader("Time lookup");
+	if (DisplayLookup) {
+		UI::Text(Gray + "Format: HH:MM:SS.mm");
+
+		string input = UI::InputText("", TimeInput);
+		if (TimeInput != input && input != "") {
+			TimeInput = input;
+		}
+
+		bool pressed = UI::Button("Submit", vec2(70, 30));
+		if (!PosButtonPressed && pressed) {
+			PosButtonPressed = pressed;
+		}
+		if (PosLookupResult.Length > 0) {
+			UI::Text(PosLookupResult);
+		}
+	}
+
 	UI::End();
 }
 
@@ -68,10 +98,36 @@ void Main() {
 			}
 		} else if (map !is null && !enteredNewMap) {
 			int score = GetPlayerScore(network, map.MapInfo.MapUid);
+
+			if (PosButtonPressed) {
+				int parsed_time = ParseTimeInput();
+				trace("Parsed time input: " + parsed_time);
+
+				int position = Api::GetPositionFromTime(map.MapInfo.MapUid, parsed_time);
+
+				int diff_ms = score - parsed_time;
+
+				string formatted_diff = Time::Format(diff_ms);
+				PosLookupResult = NextIcon + "Rank " + position + " ";
+				if (MapPlayerCount > 0) {
+					float percentage = CalcPositionPercentage(position, MapPlayerCount);
+					PosLookupResult += "(Top " + percentage + "%) ";
+				}
+				if (diff_ms > 0) {
+					PosLookupResult += LightBlue + "-" + formatted_diff;
+				} else {
+					PosLookupResult += Red + "+" + formatted_diff;
+				}
+
+				PosButtonPressed = false;
+			}
+	
 			if (score > 0 && (PlayerScore == -1 || score < PlayerScore)) {
+				trace("Got player score: " + score);
 				PlayerScore = score;
 				ShouldRefetchLeaderboard = true;
 			}
+
 			if (ShouldRefetchLeaderboard) {
 				GetLeaderboardInfo(map, network);
 			}
@@ -79,6 +135,23 @@ void Main() {
 		
 		sleep(500);
 	}
+}
+
+int ParseTimeInput() {
+	if (TimeInput.Length == 0) {
+		return 0;
+	}
+
+	auto ms_split = TimeInput.Split(".");
+	auto hhmmss_split = ms_split[0].Split(":");
+	string formatted = "";
+	for (uint i = 0; i < hhmmss_split.Length; i++) {
+		formatted += hhmmss_split[i];
+	}
+	if (ms_split.Length == 2) {
+		formatted += ms_split[1];
+	}
+	return Text::ParseInt(formatted);
 }
 
 void GetLeaderboardInfo(CGameCtnChallenge@ &in map, CTrackManiaNetwork@ &in network) {
@@ -97,16 +170,17 @@ void GetLeaderboardInfo(CGameCtnChallenge@ &in map, CTrackManiaNetwork@ &in netw
 		int position = Api::GetPlayerPosition(map_uid, PlayerScore);
 		trace("Fetched player's leaderboard position: " + position);
 
-		if (position == 1) {
+		if (player_count == -1) {
+			Message = ErrorIcon + "Something went wrong!";
+		} else if (position == 1) {
 			Message = GlobeIcon + "Rank " + position + "/~" + player_count + " (WR)";
 		} else if (player_count == 0) {
 			Message = GlobeIcon + "Total: No players yet";
-		} else if (player_count == -1) {
-			Message = ErrorIcon + "Something went wrong!";
 		} else {
 			auto percentage = CalcPositionPercentage(position, player_count);
 			Message = GlobeIcon + "Rank " + position + "/~" + player_count + " (Top " + percentage + "%)";
 		}
+		MapPlayerCount = player_count;
 	}
 
 	ShouldRefetchLeaderboard = false;

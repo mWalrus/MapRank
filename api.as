@@ -1,8 +1,8 @@
 namespace Api {
-	const string TM_API_URL = "https://tm.waalrus.xyz/np/map/";
+	const string TM_API_URL = "https://tm.waalrus.xyz";
 
-	uint GetPlayerCount(const string &in map_uid) {
-		auto url = TM_API_URL + map_uid;
+	int GetPlayerCount(const string &in map_uid) {
+		auto url = TM_API_URL + "/np/map/" + map_uid;
 		auto req = Net::HttpRequest();
 
 		req.Url = url;
@@ -52,5 +52,25 @@ namespace Api {
 		int position = world_top[0].Get('position', -1);
 
 		return position;
-	}	
+	}
+
+	int GetPositionFromTime(const string &in map_uid, int &in score) {
+		auto url = TM_API_URL + "/pos/" + map_uid + "/" + score;
+		auto req = Net::HttpRequest();
+
+		req.Url = url;
+		req.Method = Net::HttpMethod::Get;
+
+		req.Start();
+
+		while(!req.Finished()) yield();
+
+		if (req.ResponseCode() != 200) {
+			return -1;
+		}
+
+		const Json::Value@ json = Json::Parse(req.String());
+		uint pos = json.Get('position', 0);
+		return pos;
+	}
 }
