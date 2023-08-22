@@ -167,13 +167,26 @@ int ParseTimeInput() {
 
 	auto ms_split = TimeInput.Split(".");
 	auto hhmmss_split = ms_split[0].Split(":");
+
 	string formatted = "";
 	for (uint i = 0; i < hhmmss_split.Length; i++) {
-		formatted += hhmmss_split[i];
+		formatted += tostring(Text::ParseInt(hhmmss_split[i]));
 	}
-	if (ms_split.Length == 2) {
-		formatted += ms_split[1];
+
+	if (ms_split.Length >= 2) {
+		auto ms = FormatMS(ms_split[1]);
+		formatted += ms;
+	} else {
+		formatted += "000";
 	}
+
+	// trim whitespaces
+	formatted = formatted.Trim();
+
+	// replace the time input with a correctly formatted one
+	int formatted_int = Text::ParseInt(formatted);
+	TimeInput = Time::Format(formatted_int);
+
 	return Text::ParseInt(formatted);
 }
 
@@ -229,6 +242,24 @@ int GetPlayerScore(CTrackManiaNetwork@ &in network, const string &in map_uid) {
 	auto scoreMgr = network.ClientManiaAppPlayground.ScoreMgr;
 
 	return scoreMgr.Map_GetRecord_v2(userId, map_uid, "PersonalBest", "", "TimeAttack", "");
+}
+
+string FormatMS(const string &in ms) {
+	uint ms_num = Text::ParseUInt(ms);
+	trace(ms_num);
+	if (ms_num < 10) {
+		ms_num = ms_num * 100;
+	} else if (ms_num < 100) {
+		ms_num = ms_num * 10;
+	} else if (ms_num > 999) {
+		ms_num = 000;
+	}
+
+	if (ms_num == 0) {
+		return "000";
+	} else {
+		return tostring(ms_num);
+	}
 }
 
 float CalcPositionPercentage(const int &in pos, const int &in player_count) {
