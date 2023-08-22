@@ -79,7 +79,7 @@ void Render() {
 		if (DisplayLookup) {
 			UI::Text(Gray + "Format: HH:MM:SS.mm");
 
-			string input = UI::InputText("", TimeInput);
+			string input = UI::InputText("##TimeInput", TimeInput);
 			if (TimeInput != input && input != "") {
 				TimeInput = input;
 			}
