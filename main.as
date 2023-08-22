@@ -7,6 +7,7 @@ string ShowTimeLookupSettingText = "Hide";
 string Purple = "\\$96F";
 string Blue = "\\$06C";
 string Red = "\\$f00";
+string LightRed = "\\$E77";
 string LightBlue = "\\$ADE";
 string Gray = "\\$888";
 string Green = "\\$0d0";
@@ -128,7 +129,7 @@ void Main() {
 
 				int position = Api::GetPositionFromTime(map.MapInfo.MapUid, parsed_time);
 
-				int diff_ms = score - parsed_time;
+				int diff_ms = Math::Abs(score - parsed_time);
 
 				string formatted_diff = Time::Format(diff_ms);
 				PosLookupResult = NextIcon + "Rank " + position + " ";
@@ -136,10 +137,10 @@ void Main() {
 					float percentage = CalcPositionPercentage(position, MapPlayerCount);
 					PosLookupResult += "(Top " + percentage + "%) ";
 				}
-				if (diff_ms > 0) {
+				if (parsed_time < score) {
 					PosLookupResult += LightBlue + "-" + formatted_diff;
 				} else {
-					PosLookupResult += Red + "+" + formatted_diff;
+					PosLookupResult += LightRed + "+" + formatted_diff;
 				}
 
 				PosButtonPressed = false;
