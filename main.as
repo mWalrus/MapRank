@@ -1,5 +1,8 @@
-[Setting name="Show window" description="Show or hide the window"]
+// Plugin option variables
 bool Show = true;
+bool ShowTimeLookup = true;
+string ShowWindowSettingText = "Hide";
+string ShowTimeLookupSettingText = "Hide";
 
 string Purple = "\\$96F";
 string Blue = "\\$06C";
@@ -29,8 +32,26 @@ string TimeInput = "";
 string PosLookupResult = "";
 
 void RenderMenu() {
-	if (UI::MenuItem(ListIcon + "Map Rank", "", Show)) {
-		Show = !Show;
+	if (UI::BeginMenu(ListIcon + "Map Rank")) {
+		if (UI::MenuItem(ShowWindowSettingText + " window")) {
+			if (Show) {
+				ShowWindowSettingText = "Show";
+			} else {
+				ShowWindowSettingText = "Hide";
+			}
+			Show = !Show;
+		}
+
+		if (UI::MenuItem(ShowTimeLookupSettingText + " time lookup")) {
+			if (ShowTimeLookup) {
+				ShowTimeLookupSettingText = "Show";
+			} else {
+				ShowTimeLookupSettingText = "Hide";
+			}
+			ShowTimeLookup = !ShowTimeLookup;
+		}
+
+		UI::EndMenu();
 	}
 }
 
@@ -52,22 +73,24 @@ void Render() {
 
 	UI::Begin("Map Rank", windowFlags);
 	UI::Text(Message);
-	UI::Separator();
-	DisplayLookup = UI::CollapsingHeader("Time lookup");
-	if (DisplayLookup) {
-		UI::Text(Gray + "Format: HH:MM:SS.mm");
+	if (ShowTimeLookup) {
+		UI::Separator();
+		DisplayLookup = UI::CollapsingHeader("Time lookup");
+		if (DisplayLookup) {
+			UI::Text(Gray + "Format: HH:MM:SS.mm");
 
-		string input = UI::InputText("", TimeInput);
-		if (TimeInput != input && input != "") {
-			TimeInput = input;
-		}
+			string input = UI::InputText("", TimeInput);
+			if (TimeInput != input && input != "") {
+				TimeInput = input;
+			}
 
-		bool pressed = UI::Button("Submit", vec2(70, 30));
-		if (!PosButtonPressed && pressed) {
-			PosButtonPressed = pressed;
-		}
-		if (PosLookupResult.Length > 0) {
-			UI::Text(PosLookupResult);
+			bool pressed = UI::Button("Submit", vec2(70, 30));
+			if (!PosButtonPressed && pressed) {
+				PosButtonPressed = pressed;
+			}
+			if (PosLookupResult.Length > 0) {
+				UI::Text(PosLookupResult);
+			}
 		}
 	}
 
