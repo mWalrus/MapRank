@@ -1,8 +1,8 @@
 // Plugin option variables
 bool Show = true;
-bool ShowTimeLookup = true;
+bool ShowTimeLookup = false;
 string ShowWindowSettingText = "Hide";
-string ShowTimeLookupSettingText = "Hide";
+string ShowTimeLookupSettingText = "Show";
 
 string Purple = "\\$96F";
 string Blue = "\\$06C";
