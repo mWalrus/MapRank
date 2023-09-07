@@ -1,8 +1,6 @@
 // Plugin option variables
 bool Show = true;
 bool ShowTimeLookup = false;
-string ShowWindowSettingText = "Hide";
-string ShowTimeLookupSettingText = "Show";
 
 string Purple = "\\$96F";
 string Blue = "\\$06C";
@@ -34,21 +32,11 @@ string PosLookupResult = "";
 
 void RenderMenu() {
 	if (UI::BeginMenu(ListIcon + "Map Rank")) {
-		if (UI::MenuItem(ShowWindowSettingText + " window")) {
-			if (Show) {
-				ShowWindowSettingText = "Show";
-			} else {
-				ShowWindowSettingText = "Hide";
-			}
+		if (UI::MenuItem(OptionToHuman(Show) + " window")) {
 			Show = !Show;
 		}
 
-		if (UI::MenuItem(ShowTimeLookupSettingText + " time lookup")) {
-			if (ShowTimeLookup) {
-				ShowTimeLookupSettingText = "Show";
-			} else {
-				ShowTimeLookupSettingText = "Hide";
-			}
+		if (UI::MenuItem(OptionToHuman(ShowTimeLookup) + " time lookup")) {
 			ShowTimeLookup = !ShowTimeLookup;
 		}
 
@@ -116,6 +104,9 @@ void Main() {
 			PlayerScore = -1;
 			ShouldRefetchLeaderboard = false;
 			Message = InitMessage;
+			TimeInput = "";
+			PosLookupResult = "";
+			ShowTimeLookup = false;
 			if (map !is null) {
 				CurrentMapUid = map.MapInfo.MapUid;
 				ShouldRefetchLeaderboard = true;
@@ -265,4 +256,12 @@ string FormatMS(const string &in ms) {
 
 float CalcPositionPercentage(const int &in pos, const int &in player_count) {
 	return float(int(((float(pos) / float(player_count)) * 100.0) * 100.0)) / 100.0;
+}
+
+string OptionToHuman(const bool &in toggle) {
+	if (toggle) {
+		return "Hide";
+	} else {
+		return "Show";
+	}
 }
