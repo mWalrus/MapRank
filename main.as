@@ -158,28 +158,25 @@ int ParseTimeInput() {
 	}
 
 	auto ms_split = TimeInput.Split(".");
-	auto hhmmss_split = ms_split[0].Split(":");
 
-	string formatted = "";
-	for (uint i = 0; i < hhmmss_split.Length; i++) {
-		formatted += tostring(Text::ParseInt(hhmmss_split[i]));
+	string time = TimeInput;
+
+	// This is so that partial millisecond inputs arent parsed incorrectly.
+	// Otherwise "40.6" would become "40006" when parsed, instead of "40600" which is correct.
+	if (ms_split.Length > 1) {
+		auto ms = Text::ParseInt(ms_split[1]);
+
+		if (ms < 10) {
+			ms *= 100;
+		}
+		else if (ms > 10 && ms < 100) {
+			ms *= 10;
+		}
+
+		time = ms_split[0] + "." + ms;
 	}
 
-	if (ms_split.Length >= 2) {
-		auto ms = FormatMS(ms_split[1]);
-		formatted += ms;
-	} else {
-		formatted += "000";
-	}
-
-	// trim whitespaces
-	formatted = formatted.Trim();
-
-	// replace the time input with a correctly formatted one
-	int formatted_int = Text::ParseInt(formatted);
-	TimeInput = Time::Format(formatted_int);
-
-	return Text::ParseInt(formatted);
+	return Time::ParseRelativeTime(time);
 }
 
 void GetLeaderboardInfo(CGameCtnChallenge@ &in map, CTrackManiaNetwork@ &in network) {
@@ -234,24 +231,6 @@ int GetPlayerScore(CTrackManiaNetwork@ &in network, const string &in map_uid) {
 	auto scoreMgr = network.ClientManiaAppPlayground.ScoreMgr;
 
 	return scoreMgr.Map_GetRecord_v2(userId, map_uid, "PersonalBest", "", "TimeAttack", "");
-}
-
-string FormatMS(const string &in ms) {
-	uint ms_num = Text::ParseUInt(ms);
-	trace(ms_num);
-	if (ms_num < 10) {
-		ms_num = ms_num * 100;
-	} else if (ms_num < 100) {
-		ms_num = ms_num * 10;
-	} else if (ms_num > 999) {
-		ms_num = 000;
-	}
-
-	if (ms_num == 0) {
-		return "000";
-	} else {
-		return tostring(ms_num);
-	}
 }
 
 float CalcPositionPercentage(const int &in pos, const int &in player_count) {
