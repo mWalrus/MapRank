@@ -66,7 +66,7 @@ void Render() {
 		UI::Separator();
 		DisplayLookup = UI::CollapsingHeader("Time lookup");
 		if (DisplayLookup) {
-			UI::Text(Gray + "Format: HH:MM:SS.mm");
+			UI::Text(Gray + "Format: HH:MM:SS.mmm");
 
 			string input = UI::InputText("##TimeInput", TimeInput);
 			if (TimeInput != input && input != "") {
