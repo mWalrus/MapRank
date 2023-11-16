@@ -195,6 +195,11 @@ void GetLeaderboardInfo(CGameCtnChallenge@ &in map, CTrackManiaNetwork@ &in netw
 		int position = Api::GetPlayerPosition(map_uid, PlayerScore);
 		trace("Fetched player's leaderboard position: " + position);
 
+		if (position > player_count) {
+			trace("Adjusted faulty total player count")
+			player_count = position;
+		}
+
 		if (player_count == -1) {
 			Message = ErrorIcon + "Something went wrong!";
 		} else if (position == 1) {
