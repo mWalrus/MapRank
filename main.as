@@ -196,7 +196,7 @@ void GetLeaderboardInfo(CGameCtnChallenge@ &in map, CTrackManiaNetwork@ &in netw
 		trace("Fetched player's leaderboard position: " + position);
 
 		if (position > player_count) {
-			trace("Adjusted faulty total player count")
+			trace("Adjusted faulty total player count");
 			player_count = position;
 		}
 
