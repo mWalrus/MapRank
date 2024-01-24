@@ -1,7 +1,7 @@
 namespace Api {
 	const string TM_API_URL = "https://tm.waalrus.xyz";
 
-	int GetPlayerCount(const string &in map_uid) {
+	int get_player_count(const string &in map_uid) {
 		auto url = TM_API_URL + "/np/map/" + map_uid;
 		auto req = Net::HttpRequest();
 
@@ -17,11 +17,15 @@ namespace Api {
 		}
 
 		const Json::Value@ json = Json::Parse(req.String());
-		uint player_count = json.Get('player_count', 0);
-		return player_count;
+
+		if (json["player_count"].GetType() == Json::Type::Null) {
+			return -1;
+		}
+
+		return json.Get("player_count", 0);
 	}
 
-	int GetPlayerPosition(const string &in map_uid, const uint &in score) {
+	int get_player_position(const string &in map_uid, int &in score) {
 		string url = NadeoServices::BaseURLLive()
 				+ "/api/token/leaderboard/group/Personal_Best/map/"
 				+ map_uid
@@ -54,7 +58,7 @@ namespace Api {
 		return position;
 	}
 
-	int GetPositionFromTime(const string &in map_uid, int &in score) {
+	int get_position_from_time(const string &in map_uid, int &in score) {
 		auto url = TM_API_URL + "/pos/" + map_uid + "/" + score;
 		auto req = Net::HttpRequest();
 
