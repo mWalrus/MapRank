@@ -126,11 +126,12 @@ class MapRank {
 					current_player_score = new_player_score;
 					should_refetch_leaderboard = true;
 				}
-
-				if (should_refetch_leaderboard) {
-					fetch_leaderboard_info(map);
-				}
 			}
+
+			if (should_refetch_leaderboard) {
+				fetch_leaderboard_info(map);
+			}
+
 			sleep(500);
 		}
 	}
