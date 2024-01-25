@@ -1,4 +1,4 @@
-MapRank@ map_rank;
+MapRank@ map_rank = MapRank();
 
 void RenderMenu() {
 	map_rank.render_menu();
@@ -12,7 +12,6 @@ void Main() {
 	NadeoServices::AddAudience("NadeoLiveServices");
 	while(!NadeoServices::IsAuthenticated("NadeoLiveServices")) yield();
 
-	@map_rank = MapRank();
 	trace("Initialized!");
 	map_rank.enter_main_loop();
 }
