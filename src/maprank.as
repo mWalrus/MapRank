@@ -18,11 +18,8 @@ class MapRank {
 	// prevent map rank from updating unnecessarily
 	bool is_idle = true;
 
-	// trackmania state
-	CTrackMania@ app = cast<CTrackMania>(GetApp());
-	CTrackManiaNetwork@ network = cast<CTrackManiaNetwork>(app.Network);
-
-	MapRank() {}
+	MapRank() {
+	}
 
 	void restore_default() {
 		current_player_score = -1;
@@ -91,6 +88,7 @@ class MapRank {
 	}
 
 	bool player_in_menu() {
+		auto app = cast<CTrackMania>(GetApp());
 		return !UI::IsGameUIVisible()
 			|| !settings_show_plugin
 			|| app.RootMap is null
@@ -98,15 +96,19 @@ class MapRank {
 			|| app.Editor !is null;
 	}
 
-	bool entered_new_map() {
-		return app.RootMap !is null && app.RootMap.MapInfo.MapUid != current_map_uid && app.Editor is null;
+	bool entered_new_map(CTrackMania@ &in app) {
+		auto map = app.RootMap;
+		return map !is null && map.MapInfo.MapUid != current_map_uid && app.Editor is null;
 	}
 
 	void enter_main_loop() {
 		while (true) {
+			auto app = cast<CTrackMania>(GetApp());
 			auto map = app.RootMap;
 
-			if (entered_new_map()) {
+			bool did_enter_new_map = entered_new_map(app);
+
+			if (did_enter_new_map) {
 				restore_default();
 				current_map_uid = map.MapInfo.MapUid;
 				should_refetch_leaderboard = true;
@@ -115,8 +117,9 @@ class MapRank {
 			} else if (map is null && !is_idle) {
 				restore_default();
 				is_idle = true;
-			} else if (map !is null && !entered_new_map()) {
-				int new_player_score = get_player_score();
+			} else if (map !is null && !did_enter_new_map) {
+				auto network = cast<CTrackManiaNetwork>(app.Network);
+				int new_player_score = get_player_score(network);
 				if (ui_pos_button_pressed) {
 					fetch_position_lookup(map);
 				}
@@ -200,7 +203,7 @@ class MapRank {
 		ui_pos_button_pressed = false;
 	}
 
-	int get_player_score() {
+	int get_player_score(CGameCtnNetwork@ &in network) {
 		// we dont handle online cases as of yet.
 		// reference for the future:
 		// https://github.com/Phlarx/tm-ultimate-medals/blob/147055b748332ddaa99cfbc2534e1ff835bdff29/UltimateMedals.as#L593-L599
